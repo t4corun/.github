@@ -13,9 +13,15 @@ on:
         default: "master"
         required: false
         type: string
+<<<<<<< HEAD
       qmk_nontree_json:
         description: "json file containing non-tree keyboards"
         default: "qmk_nontree.json"
+=======
+      preparation_command:
+        description: "command to execute before `qmk userspace-compile`"
+        default: ""
+>>>>>>> fe756120686b7e18f6a800ca0d8fe132c62043e3
         required: false
         type: string
 
@@ -90,6 +96,11 @@ jobs:
             echo "Copying keyboard: $target"
             cp $GITHUB_WORKSPACE/keyboards/$target $GITHUB_WORKSPACE/qmk_firmware/keyboards -R
           done
+
+      - name: Preparation command
+        if: inputs.preparation_command != ''
+        run: |
+          ${{ inputs.preparation_command }}
 
       - name: Build
         run: |
