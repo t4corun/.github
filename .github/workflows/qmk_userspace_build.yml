@@ -16,6 +16,8 @@ on:
       qmk_nontree_json:
         description: "json file containing non-tree keyboards"
         default: "qmk_nontree.json"
+        required: false
+        type: string
       preparation_command:
         description: "command to execute before `qmk userspace-compile`"
         default: ""
