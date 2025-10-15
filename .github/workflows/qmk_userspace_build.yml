@@ -18,6 +18,16 @@ on:
         default: "qmk_nontree.json"
         required: false
         type: string
+      bastardkb_repo:
+        description: "bastardkb qmk_firmware repo to copy kb definition"
+        default: "Bastardkb/bastardkb-qmk"
+        required: false
+        type: string
+      bastardkb_ref:
+        description: "bastardkb qmk_firmware branch to use"
+        default: "bkb-master"
+        required: false
+        type: string
       preparation_command:
         description: "command to execute before `qmk userspace-compile`"
         default: ""
@@ -54,6 +64,22 @@ jobs:
           path: qmk_firmware
           repository: ${{ inputs.qmk_repo || 'qmk/qmk_firmware' }}
           ref: ${{ inputs.qmk_ref || 'master' }}
+          submodules: recursive
+
+      - name: Check if Bastardkb qmk_firmware exists
+        id: check_files_bastardkb
+        uses: andstor/file-existence-action@v3
+        with:
+          files: bastardkb-qmk
+
+      - name: Checkout Bastardkb QMK Firmware
+        uses: actions/checkout@v4
+        if: steps.check_files_bastardkb.outputs.files_exists == 'false'
+        with:
+          token: ${{ github.token }}
+          path: bastardkb-qmk
+          repository: ${{ inputs.bastardkb_repo || 'Bastardkb/bastardkb-qmk' }}
+          ref: ${{ inputs.bastardkb_ref || 'bkb-master' }}
           submodules: recursive
 
       - name: Install QMK CLI
@@ -95,6 +121,13 @@ jobs:
             echo "Copying keyboard: $target"
             cp $GITHUB_WORKSPACE/keyboards/$target $GITHUB_WORKSPACE/qmk_firmware/keyboards -R
           done
+
+      - name: Replace BastardKB Keyboard Definitions from his repo to QMK Firmware
+        run: |
+          echo "Deleting keyboard: bastardkb"
+          rm -rf $GITHUB_WORKSPACE/qmk_firmware/keyboards/bastardkb
+          echo "Copying keyboard: bastardkb"
+          cp $GITHUB_WORKSPACE/bastardkb-qmk/keyboards/bastardkb $GITHUB_WORKSPACE/qmk_firmware/keyboards -R
 
       - name: Preparation command
         if: inputs.preparation_command != ''
