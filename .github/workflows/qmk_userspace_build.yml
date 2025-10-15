@@ -80,7 +80,6 @@ jobs:
           path: bastardkb-qmk
           repository: ${{ inputs.bastardkb_repo || 'Bastardkb/bastardkb-qmk' }}
           ref: ${{ inputs.bastardkb_ref || 'bkb-master' }}
-          submodules: recursive
 
       - name: Install QMK CLI
         run: |
